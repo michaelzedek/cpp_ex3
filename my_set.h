@@ -19,7 +19,6 @@ public:
 
     using const_iterator = mySetIterator<T, false>;
     using iterator = mySetIterator<T, false>;
-    using node = std::shared_ptr<BstNode>;
     using const_reverse_iterator = mySetIterator<T, true>;
     typedef size_t size_type;
     friend mySetIterator<T, false>;
@@ -49,43 +48,50 @@ public:
     size_type erase (const T& val);
     iterator  erase (const_iterator first, const_iterator last);
     void clear() noexcept;
-    void swap(my_set& x) noexcept;
+    void swap(my_set& x);
     my_set&operator = (my_set & other);
     const_iterator find (const T& val) const;
 
     const_iterator cbegin() const noexcept{return mySetIterator<T, false>(_root);};
 
-    const_iterator cend() const noexcept {return mySetIterator();};
+    const_iterator cend() const noexcept {return mySetIterator<T, false>();};
 
     const_reverse_iterator crbegin() const noexcept{return mySetIterator<T, true>(_root);};
 
     const_reverse_iterator crend() const noexcept{return nullptr;};
 
-private:
-    size_type _size;
-    node _root;
-    node _tail;
+
+
+
     class BstNode{
+    public:
+        using node = std::shared_ptr<BstNode>;
     public:
         BstNode(const T& data): _data(data) {}
         T _data;
         node _right = nullptr;
         node _left = nullptr;
-//        node _predecessor = nullptr;
+        node _predecessor = nullptr;
     };
+    using node = std::shared_ptr<BstNode>;
 
+private:
     bool _findHelper(const T &val, node& cur) const;
     void _insertHelper(node& toInsert, node &position);
     node& _findNodeParent(const T &val);
     void _eraseHelper(node& toDelete, node& parent);
+    size_type _size;
+    node _root;
+    node _tail;
 };
 
 
 template <class T, bool REVERSE>
 class mySetIterator{
 public:
-    explicit mySetIterator(const my_set::node &_cur = nullptr);
-    mySetIterator<T, REVERSE>(const my_set<T>::node &head, const T& val);
+    mySetIterator(typename my_set<T>::node &_cur);
+    mySetIterator();
+    mySetIterator<T, REVERSE>(typename my_set<T>::node &head, T& val);
     ~mySetIterator(){_it.clear();};
     T& operator*() const;
     T* operator->() const;
@@ -93,19 +99,19 @@ public:
     mySetIterator operator++(int);
     mySetIterator& operator--();
     mySetIterator operator--(int);
-    bool operator==(mySetIterator& const rhs);
-    bool operator!=(mySetIterator& const rhs);
+    bool operator==(mySetIterator& rhs);
+    bool operator!=(mySetIterator& rhs);
 
     friend class my_set<T>;
 
 
 private:
-    my_set::node _cur;
+    typename my_set<T>::node _root;
     int _curIndex;
     unsigned long _size;
-    std::vector<my_set::node> _it;
-    void _initIterator(const my_set::node& _root);
-    void _inOrderTraversalToVec(const my_set::node& cur);
+    std::vector<typename my_set<T>::node> _it;
+    void _initIterator(typename my_set<T>::node& root);
+    void _inOrderTraversalToVec(typename my_set<T>::node& root);
 };
 
 

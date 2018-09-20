@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 
             my_set<char> c2;
 //			for(const auto i : c1)
-			for (auto i=c1.cbegin(); i != c1.cend(); ++i)
+//			for (auto i=c1.cbegin(); i != c1.cend(); ++i)
             {
                 c2.insert(*i);
             }

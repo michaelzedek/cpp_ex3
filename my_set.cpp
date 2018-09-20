@@ -29,30 +29,21 @@ my_set<T>::my_set(InputIterator first, InputIterator last)
 {
     insert(first, last);
 }
+
 template <class T>
-my_set<T>::size_type my_set<T>::size() const
-{
-    return _size;
-}
-template <class T>
-void my_set<T>::swap(my_set& x) noexcept {
+void my_set<T>::swap(my_set& x){
     std::swap(_root, x._root);
     size_type tmp = _size;
     _size = x._size;
     x._size = tmp;
 }
-
-my_set &my_set::operator=(my_set &other)
+template <class T>
+my_set<T> &my_set<T>::operator=(my_set &other)
 {
     swap(other);
     return *this;
 }
 
-template <class T>
-bool my_set::empty() const
-{
-    return size() == 0;
-}
 template <class T>
 std::pair<typename my_set<T>::const_iterator, bool> my_set<T>::insert(const T &val)
 {
@@ -81,7 +72,7 @@ typename my_set<T>::const_iterator my_set<T>::insert(const_iterator position, co
     return insert(val).first;
 }
 template <class T>
-my_set<T>::const_iterator my_set<T>::insert(const_iterator position, T &&val)
+typename my_set<T>::const_iterator my_set<T>::insert(const_iterator position, T &&val)
 {
     return insert(position, val);
 }
@@ -96,12 +87,12 @@ void my_set<T>::insert(InputIterator first, InputIterator last)
     }
 }
 template <class T>
-my_set<T>::iterator my_set<T>::erase(const_iterator position)
+typename my_set<T>::iterator my_set<T>::erase(const_iterator position)
 {
     return my_set::iterator();
 }
 template <class T>
-my_set<T>::size_type my_set<T>::erase(const T &val)
+typename my_set<T>::size_type my_set<T>::erase(const T &val)
 {
     if(!_findHelper(val, _root)){
         return 0;
@@ -119,12 +110,12 @@ my_set<T>::size_type my_set<T>::erase(const T &val)
     return 1;
 }
 template <class T>
-my_set<T>::iterator my_set<T>::erase(const_iterator first, const_iterator last)
+typename my_set<T>::iterator my_set<T>::erase(const_iterator first, const_iterator last)
 {
     return my_set::iterator();
 }
 template <class T>
-void my_set<T>::clear()
+void my_set<T>::clear() noexcept
 {
     erase(cbegin(), cend());
 }
@@ -205,7 +196,7 @@ typename my_set<T>::node& my_set<T>::_findNodeParent(const T &val)
     return pos;
 }
 template <class T>
-void my_set::_eraseHelper(node& toDelete, node& parent){
+void my_set<T>::_eraseHelper(node& toDelete, node& parent){
     // in case of the root
     if (parent == nullptr){
 
@@ -213,17 +204,17 @@ void my_set::_eraseHelper(node& toDelete, node& parent){
 }
 
 template <class T, bool REVERSE>
-T &mySetIterator::operator*() const
+T &mySetIterator<T, REVERSE>::operator*() const
 {
     return _it[_curIndex]->_data;
 }
 template <class T, bool REVERSE>
-mySetIterator<T, REVERSE>::mySetIterator<T, REVERSE>(const my_set<T>::node &head)
+mySetIterator<T, REVERSE>::mySetIterator(typename my_set<T>::node &head)
 {
     _initIterator(head);
 }
 template <class T, bool REVERSE>
-mySetIterator<T, REVERSE>::mySetIterator<T, REVERSE>(const my_set<T>::node &head, const T& val){
+mySetIterator<T, REVERSE>::mySetIterator(typename my_set<T>::node &head, T& val){
     _initIterator(head);
     if(val != nullptr){
         while (_it[_size] != val){
@@ -236,13 +227,13 @@ mySetIterator<T, REVERSE>::mySetIterator<T, REVERSE>(const my_set<T>::node &head
 
 
 template <class T, bool REVERSE>
-T *mySetIterator::operator->() const
+T *mySetIterator<T, REVERSE>::operator->() const
 {
     return &_it[_curIndex]->_data;
 }
 
 template <class T, bool REVERSE>
-mySetIterator &mySetIterator::operator++()
+mySetIterator<T, REVERSE> &mySetIterator<T, REVERSE>::operator++()
 {
     if (REVERSE && _size > 0){
         --_size;
@@ -253,14 +244,14 @@ mySetIterator &mySetIterator::operator++()
     return *this;
 }
 template <class T, bool REVERSE>
-mySetIterator mySetIterator::operator++(int)
+mySetIterator<T, REVERSE> mySetIterator<T, REVERSE>::operator++(int)
 {
     mySetIterator temp(*this);
     operator++();
     return temp;
 }
 template <class T, bool REVERSE>
-mySetIterator &mySetIterator::operator--()
+mySetIterator<T, REVERSE> &mySetIterator<T, REVERSE>::operator--()
 {
     if (REVERSE && _size < _it.size()){
         ++_size;
@@ -270,36 +261,38 @@ mySetIterator &mySetIterator::operator--()
     }
     return *this;
 }
-
-mySetIterator mySetIterator::operator--(int)
+template <class T, bool REVERSE>
+mySetIterator<T, REVERSE> mySetIterator<T, REVERSE>::operator--(int)
 {
     mySetIterator temp(*this);
     operator--();
     return temp;
 }
+template <class T, bool REVERSE>
 
-bool mySetIterator::operator==(mySetIterator& const rhs)
+bool mySetIterator<T, REVERSE>::operator==(mySetIterator& rhs)
 {
     return _it[_size] == rhs._it[rhs._size];
 }
-
-bool mySetIterator::operator!=(mySetIterator& const rhs)
+template <class T, bool REVERSE>
+bool mySetIterator<T, REVERSE>::operator!=(mySetIterator& rhs)
 {
     return _it[_size] != rhs._it[rhs._size];;
 }
-
-void mySetIterator::_inOrderTraversalToVec(const my_set::node& root)
+template <class T, bool REVERSE>
+void mySetIterator<T, REVERSE>::_inOrderTraversalToVec(typename my_set<T>::node& root)
 {
     if (root == nullptr){
         return;
     }
-
     _inOrderTraversalToVec(root->_left);
     _it.push_back(root);
     _inOrderTraversalToVec(root->_right);
+    return;
 }
-
-void mySetIterator::_initIterator(const my_set::node& root){
+template <class T, bool REVERSE>
+void mySetIterator<T, REVERSE>::_initIterator(typename my_set<T>::node& root){
     _inOrderTraversalToVec(root);
     _size = _it.size();
+    return;
 }
